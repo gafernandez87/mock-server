@@ -4,6 +4,8 @@ const MongoClient = require('mongodb').MongoClient
 const bodyParser = require('body-parser')
 const MockController = require('./controllers/MockController')
 const Constants = require('./utils/Constants')
+var js2xmlparser = require("js2xmlparser");
+
 const app = express()
 
 app.use(bodyParser.json());
@@ -12,7 +14,49 @@ var db;
 
 app.get("/healthCheck", (_, res) => {
     res.send("Healty")
-})  
+})
+
+app.get("/xml", (req, res) => {
+    var obj = {
+        "firstName": "John",
+        "lastName": "Smith",
+        "dateOfBirth": new Date(1964, 7, 26),
+        "address": {
+            "@": {
+                "type": "home"
+            },
+            "streetAddress": "3212 22nd St",
+            "city": "Chicago",
+            "state": "Illinois",
+            "zip": 10000
+        },
+        "phone": [
+            {
+                "@": {
+                    "type": "home"
+                },
+                "#": "123-555-4567"
+            },
+            {
+                "@": {
+                    "type": "cell"
+                },
+                "#": "890-555-1234"
+            },
+            {
+                "@": {
+                    "type": "work"
+                },
+                "#": "567-555-8901"
+            }
+        ],
+        "email": "john@smith.com"
+    };
+    
+    res.type("application/xml")
+    res.send(js2xmlparser.parse("person", obj));
+    
+})
 
 app.get("/mocks", (req, res) => {
     findAll(Constants.MOCK_COLLECTION_NAME).then(mocks => {
@@ -138,7 +182,7 @@ function findAll(collectionName){
 
 function addRouteEndpoint(request) {
     const { method, path } = request.httpRequest;
-    const { body, statusCode } = request.httpResponse;
+    const { body, statusCode, headers } = request.httpResponse;
 
     (app.route(path)[method.toLowerCase()])( (_, res) => {
         res.header("Access-Control-Allow-Origin", "*"); //CORS
@@ -146,8 +190,25 @@ function addRouteEndpoint(request) {
         if(statusCode){
             res.status(statusCode)
         }
+        
+        let isXml = false
+        if(headers) {
+            let keys = Object.keys(headers)
+            keys.forEach(key => {
+                if(headers[key].indexOf("xml") != -1){
+                    isXml = true
+                }
+
+                res.set(key, headers[key])
+            })
+        }
+
         if(body){
-            res.send(body)
+            if(isXml){
+                res.send(js2xmlparser.parse("body", body))
+            }else{
+                res.send(body)
+            }
         }else{
             res.send("")
         }

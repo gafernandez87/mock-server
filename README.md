@@ -19,18 +19,29 @@ Create and endpoint
 ````
 POST /mocks/:mock_id/endpoints
 {
-	"name": "Get user 1",
+	"name": "Create users",
 	"author": "Gaston Fernandez",
 	"httpRequest" : {
-    	"method" : "GET",
-    	"path" : "/api/v1/users/1"
+    	"method" : "DELETE",
+    	"path" : "/api/v1/users/1",
+    	"headers": {
+			"Content-type": "application/json",
+			"Connection": "keep-alive"
+		}
 	},
 	"httpResponse" : {
 		"body":{
-			"name": "Gaston",
-			"last_name": "Fernandez"
+			"errors": [{
+				"message": "USER DOES NOT EXIST",
+				"code": "USER001"
+			}]
 		},
-		"statusCode": 200
+		"headers": 
+    		{
+    			"Content-type": "application/json",
+    			"Connection": "keep-alive"
+    		},
+		"statusCode": 400
     }
 }
 ````
