@@ -1,7 +1,21 @@
 const Constants = require('../utils/Constants')
-const { db, find, findAll } = require('../index')
+const MongoClient = new (require('../clients/MongoClient'))()
 
 module.exports = class MockController {
+    
+    getAllMocks(_, res) {
+        console.log("getting all mocks")
+        MongoClient.findAll(Constants.MOCK_COLLECTION_NAME).then(mocks => {
+            res.status(200)
+            res.type("application/json")
+            res.send(mocks)
+        })
+        .catch(err => {
+            res.status(500)
+            res.send("Error")
+        })
+    }
+
     newMock(req, res){
         const collection = db.collection("mocks")
         const { name, brand, product, author, description } = req.body
@@ -12,7 +26,8 @@ module.exports = class MockController {
             product,
             author,
             description,
-            creation_date: new Date().toISOString()
+            creation_date: new Date().toISOString(),
+            last_update: new Date().toISOString()
         })
         .then(data => {
             res.status(201)
@@ -24,16 +39,11 @@ module.exports = class MockController {
         })
     }
 
-    getAllMocks(req, res) {
-        findAll(Constants.MOCK_COLLECTION_NAME).then(mocks => {
-            res.status(200)
-            res.header("Access-Control-Allow-Origin", "*"); //CORS
-            res.type("application/json")
-            res.send(mocks)
-        })
-        .catch(err => {
-            res.status(500)
-            res.send("Error")
-        })
+    updateMock(){
+
+    }
+
+    deleteMock(){
+
     }
 }
