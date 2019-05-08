@@ -143,10 +143,10 @@ module.exports = class EndpointController {
                 res.type("application/json")
                 res.send(`{"status": 200, "message": "Endpoint ${endpoint_id} deleted"}`)
             }else{
-                console.error(`{"status": 500, "message": "An error occurred while updating endpoint ${endpoint_id} and mock ${mock_id}"}`)
+                console.error(`{"status": 500, "message": "An error occurred while deleting endpoint ${endpoint_id}"`)
                 res.status(500)
                 res.type("application/json")
-                res.send(`{"status": 500, "message": "An error occurred while updating endpoint ${endpoint_id} and mock ${mock_id}"}`)
+                res.send(`{"status": 500, "message": "An error occurred while deleting endpoint ${endpoint_id}"}`)
             }
             
         }).catch(err => {

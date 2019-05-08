@@ -11,6 +11,7 @@ routes.get("/healthCheck", (_, res) => {
 
 routes.get("/mocks", MockController.getAllMocks)
 routes.post("/mocks", MockController.newMock)
+routes.delete("/mocks/:mock_id", MockController.deleteMock)
 
 routes.get("/endpoints", EndpointController.getAllEndpoints)
 routes.get("/mocks/:mock_id/endpoints", EndpointController.getAllEndpointsByMock)
