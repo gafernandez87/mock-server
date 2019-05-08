@@ -13,7 +13,8 @@ app.use(cors())
 app.use("", routes)
 
 app.listen(Constants.PORT, () => {
-    MongoClient.connect(Constants.MONGO_URL, Constants.MONGO_DB)
+    const url = Constants.MONGO_HOST + ":" + Constants.MONGO_PORT
+    MongoClient.connect(url, Constants.MONGO_DB)
     .then(database => {
         const endpointCollection = database.collection(Constants.ENDPOINT_COLLECTION_NAME)
         const endpoints = endpointCollection.find({})
