@@ -2,7 +2,8 @@ version: 0.1
 
 env:
   variables:
-   imagen: wenance/mock-server
+    owner: Integrations
+    imagen: wenance/mock-server
 phases:
   pre_build:
     commands:
@@ -24,6 +25,7 @@ phases:
       - echo $TAG_VERSION
       - echo $LAST_COMMIT
       - docker build -t $imagen .
+      - curl -s -X POST -d "{\"env\":\"$AMBIENTES\",\"service\":\"$SERVICE_NAME\",\"owner\":\"$owner\",\"message\":\"DeployStart__$CODEBUILD_SOURCE_VERSION\"}" https://hermes.fintechpeople.ninja/gchatmsg
   post_build:
     commands:
       - echo Build completed on `date`

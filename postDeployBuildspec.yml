@@ -1,0 +1,11 @@
+version: 0.2
+env:
+  variables:
+    owner: Integrations
+phases:
+  pre_build:
+    commands:
+    - echo $AMBIENTESHermes
+  build:
+    commands:
+      - curl -s -X POST -d "{\"env\":\"$AMBIENTES\",\"service\":\"$SERVICE_NAME\",\"owner\":\"$owner\",\"message\":\"DeployFinish__$CODEBUILD_SOURCE_VERSION\"}" https://hermes.fintechpeople.ninja/gchatmsg
