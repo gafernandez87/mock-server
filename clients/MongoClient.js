@@ -3,8 +3,9 @@ const MongoConnector = mongo.MongoClient
 
 module.exports = class MongoClient {
     connect(url, database) {
+        console.log(url, database)
         return new Promise(function(resolve, reject) {
-            MongoConnector.connect(url)
+            MongoConnector.connect(url, { useNewUrlParser: true })
             .then(client => {
                 console.log("Connected successfully to mongo")
                 const db = client.db(database)

@@ -12,15 +12,18 @@ app.use(bodyParser.json());
 app.use(cors())
 app.use("", routes)
 
-app.listen(Constants.PORT, () => {
+app.listen(Constants.PORT, (err) => {
     const url = Constants.MONGO_HOST + ":" + Constants.MONGO_PORT
+
     MongoClient.connect(url, Constants.MONGO_DB)
     .then(database => {
-        const endpointCollection = database.collection(Constants.ENDPOINT_COLLECTION_NAME)
-        const endpoints = endpointCollection.find({})
-        endpoints.forEach((endpoint) => {
-            addRouteEndpoint(endpoint, routes)
+        MongoClient.findAll(Constants.ENDPOINT_COLLECTION_NAME)
+        .then(endpoints => {
+            endpoints.forEach((endpoint) => {
+                addRouteEndpoint(endpoint, routes)
+            })
         })
+        
     })
 
     console.log(`Mock server app listening on port ${Constants.PORT}!`)
