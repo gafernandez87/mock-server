@@ -5,6 +5,7 @@ const Constants = require('./utils/Constants')
 const routes  = require("./routes")
 const {addRouteEndpoint} = require("./utils/RouteUtils")
 const MongoClient = new (require('./clients/MongoClient'))()
+const mongo = require('mongodb')
 
 const app = express()
 
@@ -20,7 +21,18 @@ app.listen(Constants.PORT, (err) => {
         MongoClient.findAll(Constants.ENDPOINT_COLLECTION_NAME)
         .then(endpoints => {
             endpoints.forEach((endpoint) => {
-                addRouteEndpoint(endpoint, routes)
+                const queryMock = {
+                    "_id": mongo.ObjectId(endpoint.mock_id)
+                }
+                var pathPrefix = "";
+                MongoClient.find(Constants.MOCK_COLLECTION_NAME, queryMock).then(mocks => {
+                    console.log("PRE:" + mocks[0].prefix);
+                    pathPrefix = mocks[0].prefix;
+                    addRouteEndpoint(endpoint, pathPrefix)
+                })
+                .catch(err => {
+                    
+                })
             })
         })
         

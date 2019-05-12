@@ -18,7 +18,7 @@ module.exports = class MockController {
 
     newMock(req, res){
         const collection = db.collection("mocks")
-        const { name, brand, product, author, description } = req.body
+        const { name, brand, product, author, description, prefix } = req.body
     
         collection.insertOne({
             name,
@@ -26,6 +26,7 @@ module.exports = class MockController {
             product,
             author,
             description,
+            prefix,
             creation_date: new Date().toISOString(),
             last_update: new Date().toISOString()
         })

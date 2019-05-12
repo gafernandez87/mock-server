@@ -40,6 +40,18 @@ module.exports = class EndpointController {
     newEndpoint(req, res) {
         const { httpRequest, httpResponse, name, author } = req.body
 
+        const queryMock = {
+            "_id": mongo.ObjectId(req.params.mock_id)
+        }
+        var pathPrefix = "";
+        MongoClient.find(Constants.MOCK_COLLECTION_NAME, queryMock).then(mocks => {
+            console.log("PRE:" + mocks[0].prefix);
+            pathPrefix = mocks[0].prefix;
+        })
+        .catch(err => {
+            
+        })
+
         console.log("new endpoint", req.body)
         const query = {
             "httpRequest.path": httpRequest.path,
@@ -63,7 +75,7 @@ module.exports = class EndpointController {
                 })
                 .then(data => {
                     const {addRouteEndpoint} = require("../utils/RouteUtils")
-                    addRouteEndpoint(req.body)
+                    addRouteEndpoint(req.body, pathPrefix)
                     res.status(201)
                     res.type('application/json')
                     res.send(`{"_id": "${data.insertedId}"}`)
@@ -79,11 +91,23 @@ module.exports = class EndpointController {
 
     updateEndpoint(req, res){
         const { endpoint_id, mock_id } = req.params
+        
+        const queryMock = {
+            "_id": mongo.ObjectId(mock_id)
+        }
+        var pathPrefix = "";
+        MongoClient.find(Constants.MOCK_COLLECTION_NAME, queryMock).then(mocks => {
+            console.log("PRE:" + mocks[0].prefix);
+            pathPrefix = mocks[0].prefix;
+        })
+        .catch(err => {
+            
+        })
+
         const query = {
             "_id": mongo.ObjectId(endpoint_id),
             "mock_id": mock_id
         }
-        
         MongoClient.find(Constants.ENDPOINT_COLLECTION_NAME, query)
         .then(endpoints => {
             if(endpoints.length == 0){
@@ -104,7 +128,7 @@ module.exports = class EndpointController {
             .then(result => {
                 if(result.result.n == 1){
                     const {addOrModifyRouteEndpoint} = require("../utils/RouteUtils")
-                    addOrModifyRouteEndpoint(body)
+                    addOrModifyRouteEndpoint(body, pathPrefix)
 
                     res.status(200)
                     res.type("application/json")
