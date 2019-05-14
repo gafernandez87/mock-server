@@ -19,11 +19,9 @@ app.listen(Constants.PORT, (err) => {
     //connectToVault()
     console.log("printing env vars:", process.env)
 
-    
+
     console.log("Calling vault")
-    axios.get({
-        url: 'https://vault.fintechpeople.ninja/v1/v2/data',
-        method: 'get',
+    axios.get('https://vault.fintechpeople.ninja/v1/v2/data', {
         headers: {'X-Vault-Token': 's.CORCcoLduU5fiM2JeIn5xdWx'}
     }).then(data => {
         console.log("Vault response", data)
