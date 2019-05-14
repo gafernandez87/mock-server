@@ -21,37 +21,39 @@ app.listen(Constants.PORT, (err) => {
 
 
     console.log("Calling vault")
-    axios.get('https://vault.fintechpeople.ninja/v1/v2/data', {
+    axios.get('https://vault.fintechpeople.ninja/v1/v2/data/integrations/wenance/dev/mock-server/envfile', {
         headers: {'X-Vault-Token': 's.CORCcoLduU5fiM2JeIn5xdWx'}
-    }).then(data => {
+    })
+    .then(data => {
         console.log("Vault response", data)
-    })
-    .catch(err => {
-        console.error(err)
-    })
+        const {MONGO_USER, MONGO_PASS, MONGO_HOST, MONGO_DB} = data.data
+        const url = `mongodb://${MONGO_USER}:${MONGO_PASS}@${MONGO_HOST}:27017`
 
-    const url = `mongodb://${Constants.MONGO_USER}:${Constants.MONGO_PASS}@${Constants.MONGO_HOST}:${Constants.MONGO_PORT}`
-
-    MongoClient.connect(url, Constants.MONGO_DB)
+        console.log("connecting to mongo", url)
+        return MongoClient.connect(url, MONGO_DB)
+    })
     .then(_ => {
-        MongoClient.findAll(Constants.ENDPOINT_COLLECTION_NAME)
-        .then(endpoints => {
-            endpoints.forEach((endpoint) => {
-                const queryMock = {
-                    "_id": mongo.ObjectId(endpoint.mock_id)
-                }
-                var pathPrefix = "";
-                MongoClient.find(Constants.MOCK_COLLECTION_NAME, queryMock).then(mocks => {
-                    //  console.log("PRE:" + mocks[0].prefix);
-                    pathPrefix = mocks[0].prefix;
-                    addRouteEndpoint(endpoint, pathPrefix)
-                })
-                .catch(err => {
-                    console.error(err)
-                })
+        console.log("Mongo connection successfully.")
+        return MongoClient.findAll(Constants.ENDPOINT_COLLECTION_NAME)
+    })
+    .then(endpoints => {
+        endpoints.forEach((endpoint) => {
+            const queryMock = {
+                "_id": mongo.ObjectId(endpoint.mock_id)
+            }
+            var pathPrefix = "";
+            MongoClient.find(Constants.MOCK_COLLECTION_NAME, queryMock).then(mocks => {
+                //  console.log("PRE:" + mocks[0].prefix);
+                pathPrefix = mocks[0].prefix;
+                addRouteEndpoint(endpoint, pathPrefix)
+            })
+            .catch(err => {
+                console.error(err)
             })
         })
-        
+    })
+    .catch(err => {
+        console.error(err)        
     })
 
     console.log(`Mock server app listening on port ${Constants.PORT}!`)
