@@ -18,7 +18,6 @@ function removePath(path, method, prefix){
 }
 
 function addRouteEndpoint(data, prefix) {
-    console.log(data);
     const { method, path } = data.httpRequest;
     const { body, statusCode, headers } = data.httpResponse;
 

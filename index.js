@@ -14,10 +14,10 @@ app.use(cors())
 app.use("", routes)
 
 app.listen(Constants.PORT, (err) => {
-    const url = Constants.MONGO_HOST + ":" + Constants.MONGO_PORT
+    const url = `mongodb://${Constants.MONGO_USER}:${Constants.MONGO_PASS}@${Constants.MONGO_HOST}:${Constants.MONGO_PORT}`
 
     MongoClient.connect(url, Constants.MONGO_DB)
-    .then(database => {
+    .then(_ => {
         MongoClient.findAll(Constants.ENDPOINT_COLLECTION_NAME)
         .then(endpoints => {
             endpoints.forEach((endpoint) => {
@@ -31,7 +31,7 @@ app.listen(Constants.PORT, (err) => {
                     addRouteEndpoint(endpoint, pathPrefix)
                 })
                 .catch(err => {
-                    
+                    console.error(err)
                 })
             })
         })
