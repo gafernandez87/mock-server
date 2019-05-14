@@ -18,8 +18,7 @@ app.listen(Constants.PORT, (err) => {
 
     console.log("================================")
     console.log("PROCESS ENV DATA", process.env.data)
-    console.log("MONGO_USER", process.env.data.MONGO_USER)
-    console.log("MONGO_USER", process.env.data[MONGO_USER])
+    console.log("MONGO_USER", process.env.data["MONGO_USER"])
     console.log("typeof", typeof process.env.data)
     console.log("================================")
 
