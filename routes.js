@@ -4,7 +4,7 @@ const EndpointController = new (require('./controllers/EndpointController'))()
 
 const routes = new Router()
 
-routes.get("/healthCheck", (_, res) => {
+routes.get("/health", (_, res) => {
     res.status(200)
     res.send("Healty")
 })
