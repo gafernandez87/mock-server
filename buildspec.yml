@@ -31,9 +31,9 @@ phases:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
       - docker images
-      - docker tag $imagen $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE:`docker images -q $imagen:latest`  
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE:`docker images -q $imagen:latest`
-      - printf '{"tag":"%s"}' `docker images -q $imagen:latest` > build.json
+      - docker tag wenance/mock-server $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE:`docker images -q wenance/mock-server:latest`  
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE:`docker images -q wenance/mock-server:latest`
+      - printf '{"tag":"%s"}' `docker images -q wenance/mock-server:latest` > build.json
 artifacts:
   files: build.json
 cache:
