@@ -16,22 +16,11 @@ app.use("", routes)
 
 app.listen(Constants.PORT, (err) => {
 
-    console.log("================================")
-    console.log("PROCESS ENV DATA", process.env.data)
-    console.log("MONGO_USER", process.env.data["MONGO_USER"])
-    console.log("typeof", typeof process.env.data)
     const vaultData = JSON.parse(process.env.data)
-    console.log("vaultData", vaultData)
-    console.log("================================")
+    const { MONGO_HOST, MONGO_USER,MONGO_PASS,MONGO_DB} = vaultData
+    
+    const url = `mongodb://${MONGO_USER}:${MONGO_PASS}@${MONGO_HOST}`
 
-    const MONGO_USER = vaultData.MONGO_USER
-    const MONGO_PASS = vaultData.MONGO_PASS
-    const MONGO_HOST = vaultData.MONGO_HOST
-    const MONGO_DB = vaultData.MONGO_DB
-
-    const url = `mongodb://${MONGO_USER}:${MONGO_PASS}@${MONGO_HOST}:27017`
-
-    console.log("connecting to mongo", url)
     MongoClient.connect(url, MONGO_DB)
     .then(_ => {
         console.log("Mongo connection successfully.")
@@ -44,7 +33,6 @@ app.listen(Constants.PORT, (err) => {
             }
             var pathPrefix = "";
             MongoClient.find(Constants.MOCK_COLLECTION_NAME, queryMock).then(mocks => {
-                //  console.log("PRE:" + mocks[0].prefix);
                 pathPrefix = mocks[0].prefix;
                 addRouteEndpoint(endpoint, pathPrefix)
             })
