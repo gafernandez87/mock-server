@@ -31,6 +31,7 @@ app.listen(Constants.PORT, (err) => {
 
         console.log("connecting to mongo", url)
         return MongoClient.connect(url, MONGO_DB)
+    })
     .then(_ => {
         console.log("Mongo connection successfully.")
         return MongoClient.findAll(Constants.ENDPOINT_COLLECTION_NAME)
