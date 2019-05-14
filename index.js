@@ -17,21 +17,18 @@ app.use("", routes)
 app.listen(Constants.PORT, (err) => {
 
     console.log("================================")
-    console.log("PRoESS ENV DATA", process.env.data)
-    console.log("PROCESS ENV", process.env)
+    console.log("PROCESS ENV DATA", process.env.data)
     console.log("================================")
 
-    console.log("Calling vault")
-    axios.get('https://vault.fintechpeople.ninja/v1/v2/data/integrations/wenance/dev/mock-server/envfile', {
-        headers: {'X-Vault-Token': 's.CORCcoLduU5fiM2JeIn5xdWx'}
-    })
-    .then(vault => {
-        const {MONGO_USER, MONGO_PASS, MONGO_HOST, MONGO_DB} = vault.data.data //SI POSTA data.data!!
-        const url = `mongodb://${MONGO_USER}:${MONGO_PASS}@${MONGO_HOST}:27017`
+    const MONGO_USER = process.env.data.MONGO_USER
+    const MONGO_PASS = process.env.data.MONGO_PASS
+    const MONGO_HOST = process.env.data.MONGO_HOST
+    const MONGO_DB = process.env.data.MONGO_DB
 
-        console.log("connecting to mongo", url)
-        return MongoClient.connect(url, MONGO_DB)
-    })
+    const url = `mongodb://${MONGO_USER}:${MONGO_PASS}@${MONGO_HOST}:27017`
+
+    console.log("connecting to mongo", url)
+    MongoClient.connect(url, MONGO_DB)
     .then(_ => {
         console.log("Mongo connection successfully.")
         return MongoClient.findAll(Constants.ENDPOINT_COLLECTION_NAME)
