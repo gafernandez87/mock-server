@@ -20,12 +20,14 @@ app.listen(Constants.PORT, (err) => {
     console.log("PROCESS ENV DATA", process.env.data)
     console.log("MONGO_USER", process.env.data["MONGO_USER"])
     console.log("typeof", typeof process.env.data)
+    const vaultData = JSON.parse(process.env.data)
+    console.log("vaultData", vaultData)
     console.log("================================")
 
-    const MONGO_USER = process.env.data.MONGO_USER
-    const MONGO_PASS = process.env.data.MONGO_PASS
-    const MONGO_HOST = process.env.data.MONGO_HOST
-    const MONGO_DB = process.env.data.MONGO_DB
+    const MONGO_USER = vaultData.MONGO_USER
+    const MONGO_PASS = vaultData.MONGO_PASS
+    const MONGO_HOST = vaultData.MONGO_HOST
+    const MONGO_DB = vaultData.MONGO_DB
 
     const url = `mongodb://${MONGO_USER}:${MONGO_PASS}@${MONGO_HOST}:27017`
 
