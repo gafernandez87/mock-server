@@ -6,6 +6,7 @@ const routes  = require("./routes")
 const {addRouteEndpoint} = require("./utils/RouteUtils")
 const MongoClient = new (require('./clients/MongoClient'))()
 const mongo = require('mongodb')
+const axios = require('axios')
 
 const app = express()
 
@@ -14,6 +15,23 @@ app.use(cors())
 app.use("", routes)
 
 app.listen(Constants.PORT, (err) => {
+
+    //connectToVault()
+    console.log("printing env vars:", process.env)
+
+    
+    console.log("Calling vault")
+    axios.get({
+        url: 'https://vault.fintechpeople.ninja/v1/v2/data',
+        method: 'get',
+        headers: {'X-Vault-Token': 's.CORCcoLduU5fiM2JeIn5xdWx'}
+    }).then(data => {
+        console.log("Vault response", data)
+    })
+    .catch(err => {
+        console.error(err)
+    })
+
     const url = `mongodb://${Constants.MONGO_USER}:${Constants.MONGO_PASS}@${Constants.MONGO_HOST}:${Constants.MONGO_PORT}`
 
     MongoClient.connect(url, Constants.MONGO_DB)
@@ -26,7 +44,7 @@ app.listen(Constants.PORT, (err) => {
                 }
                 var pathPrefix = "";
                 MongoClient.find(Constants.MOCK_COLLECTION_NAME, queryMock).then(mocks => {
-                    console.log("PRE:" + mocks[0].prefix);
+                    //  console.log("PRE:" + mocks[0].prefix);
                     pathPrefix = mocks[0].prefix;
                     addRouteEndpoint(endpoint, pathPrefix)
                 })
