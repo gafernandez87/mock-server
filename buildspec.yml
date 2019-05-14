@@ -3,7 +3,7 @@ version: 0.1
 env:
   variables:
     owner: Integrations
-    imagen: wenance/mock-server
+    imagen: wenance/mockServer
 phases:
   pre_build:
     commands:
