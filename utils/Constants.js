@@ -1,4 +1,4 @@
-const PORT = 8000
+const PORT = process.env.PORT || 8080
 const MONGO_HOST = process.env.MONGO_HOST || "127.0.0.1"
 const MONGO_PORT = process.env.MONGO_PORT || "27017"
 const MONGO_USER = process.env.MONGO_USER || ""
