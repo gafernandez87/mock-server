@@ -1,4 +1,4 @@
-FROM wenance/node-nr-vault:node8.15.0-nr4.2.0-vault-alpine-v1.2
+FROM wenance/node-nr-vault:node8.15.0-nr4.2.0-vault-alpine-v1.3
 
 USER root 
 
