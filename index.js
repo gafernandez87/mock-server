@@ -6,19 +6,24 @@ const routes  = require("./routes")
 const {addRouteEndpoint} = require("./utils/RouteUtils")
 const MongoClient = new (require('./clients/MongoClient'))()
 const mongo = require('mongodb')
-const axios = require('axios')
 
 const app = express()
 
 app.use(bodyParser.json());
 app.use(cors())
-app.use("", routes)
+app.use("/mock-server", routes)
 
 app.listen(Constants.PORT, (err) => {
+    let vaultData = undefined
+    if(process.env.data){
+        try{
+            vaultData = JSON.parse(process.env.data)
+        }catch(err){
+            console.err("VaultData is not a json", err)
+        }
+    }
+    const { MONGO_HOST, MONGO_USER,MONGO_PASS,MONGO_DB} = vaultData || Constants
 
-    const vaultData = JSON.parse(process.env.data)
-    const { MONGO_HOST, MONGO_USER,MONGO_PASS,MONGO_DB} = vaultData
-    
     const url = `mongodb://${MONGO_USER}:${MONGO_PASS}@${MONGO_HOST}`
 
     MongoClient.connect(url, MONGO_DB)
@@ -33,7 +38,7 @@ app.listen(Constants.PORT, (err) => {
             }
             var pathPrefix = "";
             MongoClient.find(Constants.MOCK_COLLECTION_NAME, queryMock).then(mocks => {
-                pathPrefix = mocks[0].prefix;
+                pathPrefix = mocks[0] ? mocks[0].prefix : "";
                 addRouteEndpoint(endpoint, pathPrefix)
             })
             .catch(err => {
