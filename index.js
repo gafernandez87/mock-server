@@ -14,16 +14,7 @@ app.use(cors())
 app.use("/mock-server", routes)
 
 app.listen(Constants.PORT, (err) => {
-    let vaultData = undefined
-    if(process.env.data){
-        try{
-            vaultData = JSON.parse(process.env.data)
-        }catch(err){
-            console.err("VaultData is not a json", err)
-        }
-    }
-    const { MONGO_HOST, MONGO_USER,MONGO_PASS,MONGO_DB} = vaultData || Constants
-
+    const { MONGO_HOST, MONGO_USER,MONGO_PASS,MONGO_DB} = Constants
     const url = `mongodb://${MONGO_USER}:${MONGO_PASS}@${MONGO_HOST}`
 
     MongoClient.connect(url, MONGO_DB)
