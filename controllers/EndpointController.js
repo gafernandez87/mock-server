@@ -6,7 +6,6 @@ const js2xmlparser = require("js2xmlparser");
 module.exports = class EndpointController {
     
     genericEndpoint(req, res){
-
         //Separo el prefix del path
         let prefix, path = ""
         req.path.split("/").forEach((e, i) => {
@@ -47,11 +46,11 @@ module.exports = class EndpointController {
 
                 //Seteo status code
                 res.status(endpoint.httpResponse.status_code)
-
                 const body = endpoint.httpResponse.body
                 if(body){
                     if(isXml){
-                        res.send(js2xmlparser.parse("body", body))
+                        const bodyXml = js2xmlparser.parse("body", sanitizeJson(body))
+                        res.send(bodyXml)
                     }else{
                         res.send(body)
                     }
@@ -85,13 +84,14 @@ module.exports = class EndpointController {
 
     getAllEndpointsByMock(req, res){
         const query = {
-            mock_id: req.params.mock_id
+            mock_id: mongo.ObjectId(req.params.mock_id)
         }
 
         console.log(`getting endpoints from mock ${req.params.mock_id}`)
 
         MongoClient.find(Constants.ENDPOINT_COLLECTION_NAME, query)
         .then(endpoints => {
+            console.log(query)
             res.status(200)
             res.type("application/json")
             res.send(endpoints)
@@ -223,7 +223,6 @@ module.exports = class EndpointController {
             res.send(err)
         })
     }
-
    
 }
 
@@ -239,4 +238,14 @@ function getPrefix(mockId){
             reject(err)
         })
     }) 
+}
+
+function sanitizeJson(body){
+
+    const newBody = Object.keys(body).reduce((acc, current) => {
+        acc[current.trim().replace(new RegExp(" ", 'g'), "_")] = body[current]
+        return acc
+    }, {})
+
+    return newBody
 }

@@ -9,9 +9,12 @@ routes.get("/health", (_, res) => {
     res.send("Healty")
 })
 
+routes.get("/setup", MockController.setup)
+
 routes.get("/mocks", MockController.getAllMocks)
 routes.post("/mocks", MockController.newMock)
 routes.delete("/mocks/:mock_id", MockController.deleteMock)
+routes.get("/mocks/:mock_id/clone", MockController.cloneMock)
 
 routes.get("/endpoints", EndpointController.getAllEndpoints)
 routes.get("/mocks/:mock_id/endpoints", EndpointController.getAllEndpointsByMock)
@@ -23,5 +26,7 @@ routes.delete("/mocks/:mock_id/endpoints/:endpoint_id", EndpointController.delet
 routes.get("/*", EndpointController.genericEndpoint)
 routes.put("/*", EndpointController.genericEndpoint)
 routes.post("/*", EndpointController.genericEndpoint)
+routes.delete("/*", EndpointController.genericEndpoint)
+routes.patch("/*", EndpointController.genericEndpoint)
 
 module.exports = routes
