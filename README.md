@@ -41,7 +41,7 @@ POST /mocks/:mock_id/endpoints
     			"Content-type": "application/json",
     			"Connection": "keep-alive"
     		},
-		"statusCode": 400
+		"status_code": 400
     }
 }
 ````

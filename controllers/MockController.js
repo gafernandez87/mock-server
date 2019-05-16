@@ -19,6 +19,12 @@ module.exports = class MockController {
     newMock(req, res){
         const collection = db.collection("mocks")
         const { name, brand, product, author, description, prefix } = req.body
+
+        if(!prefix){
+            res.status(400)
+            res.type("application/json")
+            res.send(`{"Error":"Prefix cannot be null or empty"}`)
+        }
     
         collection.insertOne({
             name,

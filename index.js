@@ -20,22 +20,6 @@ app.listen(Constants.PORT, (err) => {
     MongoClient.connect(url, MONGO_DB)
     .then(_ => {
         console.log("Mongo connection successfully.")
-        return MongoClient.findAll(Constants.ENDPOINT_COLLECTION_NAME)
-    })
-    .then(endpoints => {
-        endpoints.forEach((endpoint) => {
-            const queryMock = {
-                "_id": mongo.ObjectId(endpoint.mock_id)
-            }
-            var pathPrefix = "";
-            MongoClient.find(Constants.MOCK_COLLECTION_NAME, queryMock).then(mocks => {
-                pathPrefix = mocks[0] ? mocks[0].prefix : "";
-                addRouteEndpoint(endpoint, pathPrefix)
-            })
-            .catch(err => {
-                console.error(err)
-            })
-        })
     })
     .catch(err => {
         console.error(err)        

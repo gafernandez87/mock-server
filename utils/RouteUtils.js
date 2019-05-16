@@ -1,29 +1,24 @@
 const js2xmlparser = require("js2xmlparser");
 const routes = require("../routes")
 
-function removePath(path, method, prefix){
-    /*
-    let routes = app._router.stack;
-    routes.forEach(removeMiddlewares);
-    function removeMiddlewares(route, i, routes) {
-        if(route.route){
-            if(route.route.path === path && route.route.methods[method]){
-                routes.splice(i, 1);
-                route.route.stack.forEach(removeMiddlewares);
-            }
+function removePath(path, method){
+    let index = -1
+    routes.stack.forEach((route, i) => {
+        if(route.route.path === path && route.route.methods[method] == true){
+            index = i
         }
-        
-    }
-    */
+    });
+
+    routes.stack.splice(index, 1)
 }
 
-function addRouteEndpoint(data, prefix) {
+function addRouteEndpoint(data, prefix="") {
     const { method, path } = data.httpRequest;
-    const { body, statusCode, headers } = data.httpResponse;
+    const { body, status_code, headers } = data.httpResponse;
 
     (routes[method.toLowerCase()])(prefix+path, (_, res) => {
-        if(statusCode){
-            res.status(statusCode)
+        if(status_code){
+            res.status(status_code)
         }
         
         let isXml = false
@@ -53,11 +48,13 @@ function addRouteEndpoint(data, prefix) {
 function addOrModifyRouteEndpoint(data, prefix) {
     const {path, method} = data.httpRequest
     removePath(prefix+path, method)
-    addRouteEndpoint(data, prefix)
+    //addRouteEndpoint(data, prefix)
+    console.log(routes)
 }
 
 
 module.exports = {
     addOrModifyRouteEndpoint,
-    addRouteEndpoint
+    addRouteEndpoint,
+    removePath
 }
