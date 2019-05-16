@@ -30,7 +30,7 @@ module.exports = class MockController {
         .then(mock => {
             console.log(mock.insertedId)
             return MongoClient.insert(Constants.ENDPOINT_COLLECTION_NAME, {
-                mock_id: mock.insertedId,
+                mock_id: `mock.insertedId`,
                 name: "Test endpoint",
                 author: "Gaston Fernandez",
                 httpRequest: {

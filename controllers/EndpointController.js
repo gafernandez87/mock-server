@@ -84,7 +84,7 @@ module.exports = class EndpointController {
 
     getAllEndpointsByMock(req, res){
         const query = {
-            mock_id: mongo.ObjectId(req.params.mock_id)
+            mock_id: req.params.mock_id
         }
 
         console.log(`getting endpoints from mock ${req.params.mock_id}`)
