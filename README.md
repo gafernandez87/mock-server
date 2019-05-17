@@ -8,7 +8,49 @@ An endpoint defines the action that is taken, for example, a response could be r
 
 MockServer supports the follow actions:
 
-Create a mock
+
+### List all mocks
+
+````
+GET /mock-server/mocks
+
+Response
+[
+  {
+    "_id": "5cdf127e7189542dd2d17b8d",
+    "name": "New mock",
+    "country": "AR",
+    "product": "MANGO",
+    "author": "Gaston Fernandez",
+    "description": "Testing mock",
+    "prefix": "/success",
+    "creation_date": "2019-05-17T19:58:54.182Z",
+    "last_update": "2019-05-17T19:58:54.182Z"
+  }
+]
+````
+
+### Get a mock
+
+````
+GET /mock-server/mocks/:mock_id
+
+Response
+{
+	"_id": "5cdf127e7189542dd2d17b8d",
+	"name": "New mock",
+	"country": "AR",
+	"product": "MANGO",
+	"author": "Gaston Fernandez",
+	"description": "Testing mock",
+	"prefix": "/success",
+	"creation_date": "2019-05-17T19:58:54.182Z",
+	"last_update": "2019-05-17T19:58:54.182Z"
+}
+````
+
+### Create Mock
+
 ````
 POST /mock-server/mocks
     {
@@ -28,8 +70,17 @@ Response
 	}
 ````
 
+### Update Mock
 
-Create endpoint
+````
+PUT /mock-server/mocks/:mock_id
+    {
+        "name": "Flow Argentina WELP"
+    }
+````
+
+### Create Endpoint
+
 ````
 POST /mocks-server/mocks/:mock_id/endpoints
 {
@@ -64,45 +115,91 @@ POST /mocks-server/mocks/:mock_id/endpoints
 }
 ````
 
+### Delete a mock
 
-List all mocks
+This will delete the mock an all its endpoints 
+
 ````
-GET /mock-server/mocks
+DELETE /mock-server/mocks/:mock_id
+````
+
+### Get all Endpoints of a mock
+
+````
+GET /mock-server/mocks/:mock_id/endpoints
 
 Response
-[
+
   {
-    "_id": "5cdf127e7189542dd2d17b8d",
-    "name": "New mock",
-    "country": "AR",
-    "product": "MANGO",
+    "_id": "5cdf12957189542620d17b8e",
+    "mock_id": "5cdf127e7189542dd2d17b8d",
+    "name": "new endpoint",
     "author": "Gaston Fernandez",
-    "description": "Testing mock",
-    "prefix": "/success",
-    "creation_date": "2019-05-17T19:58:54.182Z",
-    "last_update": "2019-05-17T19:58:54.182Z"
+    "httpRequest": {
+      "path": "/api/v1/users/1",
+      "method": "GET",
+      "prefix": "/success"
+    },
+    "httpResponse": {
+      "status_code": 200,
+      "body": {
+        "name": "Gaston",
+        "last_name": "Fernandez"
+      },
+      "headers": {
+        
+      }
+    },
+    "creation_date": "2019-05-17T19:59:17.617Z",
+    "last_update": "2019-05-17T19:59:17.617Z"
   }
 ]
 ````
 
-Get a mock
+### Get an Endpoint
+
 ````
-GET /mock-server/mocks/:mock_id
+GET /mock-server/mocks/:mock_id/endpoints/:endpoint_id
 
 Response
-{
-	"_id": "5cdf127e7189542dd2d17b8d",
-	"name": "New mock",
-	"country": "AR",
-	"product": "MANGO",
-	"author": "Gaston Fernandez",
-	"description": "Testing mock",
-	"prefix": "/success",
-	"creation_date": "2019-05-17T19:58:54.182Z",
-	"last_update": "2019-05-17T19:58:54.182Z"
-}
+  {
+    "_id": "5cdf12957189542620d17b8e",
+    "mock_id": "5cdf127e7189542dd2d17b8d",
+    "name": "new endpoint",
+    "author": "Gaston Fernandez",
+    "httpRequest": {
+      "path": "/api/v1/users/1",
+      "method": "GET",
+      "prefix": "/success"
+    },
+    "httpResponse": {
+      "status_code": 200,
+      "body": {
+        "name": "Gaston",
+        "last_name": "Fernandez"
+      },
+      "headers": {
+        
+      }
+    },
+    "creation_date": "2019-05-17T19:59:17.617Z",
+    "last_update": "2019-05-17T19:59:17.617Z"
+  }
 ````
 
+### Update Endpoint
+````
+PUT /mock-server/mocks/:mock_id/endpoints/:endpoint_id
+    {
+        "name": "Identity Service mock"
+    }
+````
+
+### Delete an endpoint
+
+````
+DELETE /mock-server/mocks/:mock_id/endpoints/endpoint
+````
 
 ## How to use it local
 
