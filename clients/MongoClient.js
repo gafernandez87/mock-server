@@ -60,7 +60,7 @@ module.exports = class MongoClient {
     deleteMany(collectionName, query){
         const collection = db.collection(collectionName)
         return (new Promise(function(resolve, reject){
-            collection.deelteMany(query, (err, result) => {
+            collection.deleteMany(query, (err, result) => {
                 if(err){
                     reject(err)
                 }else{
