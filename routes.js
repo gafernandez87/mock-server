@@ -13,6 +13,7 @@ routes.get("/setup", MockController.setup)
 
 routes.get("/mocks", MockController.getAllMocks)
 routes.post("/mocks", MockController.newMock)
+routes.put("/mocks/:mock_id", MockController.updateMock)
 routes.delete("/mocks/:mock_id", MockController.deleteMock)
 routes.get("/mocks/:mock_id/clone", MockController.cloneMock)
 

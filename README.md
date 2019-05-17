@@ -5,8 +5,8 @@ Create a mock
 POST /mocks
     {
         "name": "Identity service mock",
-        "brand": "AR",
-        "product": "Welp",
+        "country": "AR",
+        "product": "WELP",
         "author": "Gaston Fernandez",
         "description": "Mock de la respuesta del servicio de Identity Service"
     }

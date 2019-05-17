@@ -28,9 +28,8 @@ module.exports = class MockController {
             prefix: "/success"
         })
         .then(mock => {
-            console.log(mock.insertedId)
             return MongoClient.insert(Constants.ENDPOINT_COLLECTION_NAME, {
-                mock_id: `mock.insertedId`,
+                mock_id: mock.insertedId.toString(),
                 name: "Test endpoint",
                 author: "Gaston Fernandez",
                 httpRequest: {
@@ -75,7 +74,7 @@ module.exports = class MockController {
     }
 
     newMock(req, res){
-        const { name, brand, product, author, description, prefix } = req.body
+        const { name, country, product, author, description, prefix } = req.body
 
         if(!prefix){
             res.status(400)
@@ -85,7 +84,7 @@ module.exports = class MockController {
 
         MongoClient.insert(Constants.MOCK_COLLECTION_NAME, {
             name,
-            brand,
+            country,
             product,
             author,
             description,
@@ -103,17 +102,72 @@ module.exports = class MockController {
         })
     }
 
-    updateMock(){
-        //TODO
+    updateMock(req, res){
+        const { mock_id } = req.params
+        const query = {
+            "_id": mongo.ObjectId(mock_id),
+        }
+        MongoClient.find(Constants.MOCK_COLLECTION_NAME, query)
+        .then(mocks => {
+            if(mocks.length == 0){
+                console.log(`Update Mock error. Mock (id: ${mock_id}) not found"}`)
+                res.status(404)
+                res.type("application/json")
+                res.send(`{ "status": 404, "message": "Update Mock error. Mock (${mock_id}) not found"}`)
+            }
+            if(mocks.length > 1){
+                console.log(`Update Mock error. Found more than 1 mock with id ${mock_id}`)
+                res.status(400)
+                res.type("application/json")
+                res.send(`{ "status": 400, "message": "Found more than 1 Mock with id ${mock_id}"}`)
+            }
+            
+            const {_id, ...body} = req.body   
+            MongoClient.update(Constants.MOCK_COLLECTION_NAME, query, body)
+            .then(result => {
+                if(result.result.n == 1){
+                    if(mocks[0].prefix !== body.prefix){
+                        MongoClient.find(Constants.ENDPOINT_COLLECTION_NAME, {mock_id: mock_id})
+                        .then(endpoints => {
+                            endpoints.forEach(endpoint => {
+                                endpoint.httpRequest.prefix = body.prefix
+                                MongoClient.update(Constants.ENDPOINT_COLLECTION_NAME, {_id: mongo.ObjectId(endpoint._id)}, endpoint)
+                            });
+                        })
+                    }
+
+                    res.status(200)
+                    res.type("application/json")
+                    res.send(`{"status": 200, "message": "Mock ${mock_id} updated"}`)
+                }else{
+                    res.status(500)
+                    res.type("application/json")
+                    res.send(`{"status": 500, "message": "An error occurred while updating mock ${mock_id}"}`)
+                }
+            })
+            .catch(err => {
+                console.error(`Error updating Mock 1 ${mock_id}`, err)
+                res.status(500)
+                res.type("application/json")
+                res.send(`{"status": 500, "message": "Error updating Mock 1 ${mock_id}"}`)
+            })
+        }).catch(err => {
+            console.error(`Error updating mock 2 ${mock_id}`, err)
+            res.status(500)
+            res.type("application/json")
+            res.send(`{"status": 500, "message": "Error updating Mock 2 ${mock_id}"}`)
+        })
     }
 
     deleteMock(req, res){
         const { mock_id } = req.params
         const query = {_id: mongo.ObjectId(mock_id)}
 
-        MongoClient.delete(Constants.MOCK_COLLECTION_NAME, query)
+        MongoClient.deleteOne(Constants.MOCK_COLLECTION_NAME, query)
         .then(data => {
             if(data.result.n == 1){
+                MongoClient.deleteMany(Constants.ENDPOINT_COLLECTION_NAME, {mock_id: mock_id})
+                
                 res.status(200)
                 res.type("application/json")
                 res.send(`{"status": 200, "message": "Mock ${mock_id} deleted"}`)
@@ -123,7 +177,6 @@ module.exports = class MockController {
                 res.type("application/json")
                 res.send(`{"status": 500, "message": "An error occurred while deleting Mock ${mock_id}"}`)
             }
-            
         }).catch(err => {
             console.error(`Error deleting Mock ${mock_id}`, err)
             res.status(500)
@@ -136,7 +189,6 @@ module.exports = class MockController {
         const { mock_id } = req.params
         const mockQuery = {_id: mongo.ObjectId(mock_id)}
         const endpointQuery = {mock_id: mock_id}
-
 
         const mockPromise = new Promise(function(resolve, reject) {
             MongoClient.find(Constants.MOCK_COLLECTION_NAME, mockQuery)
@@ -152,11 +204,10 @@ module.exports = class MockController {
         const endpointPromise = new Promise(function(resolve, reject) {
             MongoClient.find(Constants.ENDPOINT_COLLECTION_NAME, endpointQuery)
             .then(endpoints => {
-                if(endpoints.length == 0){
-                    reject("endpoints not found")
-                }else{                
-                    resolve(endpoints)
-                }
+                resolve(endpoints)
+            })
+            .catch(err => {
+                reject(err)
             })
         })
 
@@ -165,22 +216,25 @@ module.exports = class MockController {
             const mock = {...data[0]}
             const endpointList = [...data[1]]
 
+            //Inserto el mock clonado
             MongoClient.insert(Constants.MOCK_COLLECTION_NAME, {
                 name: `(Copy) ${mock.name}`,
-                brand: mock.brand,
+                country: mock.country,
                 product: mock.product,
                 author: mock.author,
                 description: mock.description,
                 prefix: `/copy${mock.prefix}`
             })
             .then(newMock => {
-                console.log(endpointList)
+                //Inserto los clones de los endpoints
                 const newEndpointIdList = endpointList.map(endpoint =>{
+                    const newHttpRequest = {...endpoint.httpRequest}
+                    newHttpRequest.prefix = `/copy${newHttpRequest.prefix}`
                     return MongoClient.insert(Constants.ENDPOINT_COLLECTION_NAME, {
-                        mock_id: newMock.insertedId, 
+                        mock_id: newMock.insertedId.toString(), 
                         name: `(Copy) ${endpoint.name}`,
                         author: endpoint.author,
-                        httpRequest: {...endpoint.httpRequest},
+                        httpRequest: newHttpRequest,
                         httpResponse: {...endpoint.httpResponse}
                     })
                     .then(newEndpoint => {
@@ -193,7 +247,10 @@ module.exports = class MockController {
                 }
                 res.type("application/json")
                 res.send(obj)
-    
+            })
+            .catch(err => {
+                res.type("application/json")
+                res.send(`Error ${err}`)
             })
         })
         .catch(err => {

@@ -21,7 +21,7 @@ module.exports = class EndpointController {
             "httpRequest.path": path,
             "httpRequest.method": req.method.toUpperCase()
         }
-
+        console.log(query)
         MongoClient.find(Constants.ENDPOINT_COLLECTION_NAME, query)
         .then(data => {
             if(data.length == 0){
@@ -116,6 +116,7 @@ module.exports = class EndpointController {
                 "httpRequest.method": httpRequest.method
             }
     
+            console.log(query)
             MongoClient.find(Constants.ENDPOINT_COLLECTION_NAME, query)
             .then(items => {
                 if(items.length > 0){
@@ -123,9 +124,9 @@ module.exports = class EndpointController {
                     res.type('application/json')
                     res.send(`{"error": "El path ${httpRequest.path} ya existe"}`)
                 }else{
-                    MongoClient.insert(Constants.ENDPOINT_COLLECTION_NAME, 
+                    MongoClient.insert(Constants.ENDPOINT_COLLECTION_NAME,
                     {
-                        mock_id: req.params.mock_id, 
+                        mock_id: req.params.mock_id,
                         name,
                         author,
                         httpRequest,
@@ -160,13 +161,13 @@ module.exports = class EndpointController {
                 console.log(`Update endpoint error. Endpoint (id: ${endpoint_id}) not found in mocks(id: ${mock_id})"}`)
                 res.status(404)
                 res.type("application/json")
-                res.send(`{ "status": 404, "message: "Endpoint (id: ${endpoint_id}) not found in mocks(id: ${mock_id})"}`)
+                res.send(`{ "status": 404, "message": "Endpoint (id: ${endpoint_id}) not found in mocks(id: ${mock_id})"}`)
             }
             if(endpoints.length > 1){
                 console.log(`Update endpoint error. Found more than 1 endpoint with id ${endpoint_id} and mockid ${mock_id}`)
                 res.status(400)
                 res.type("application/json")
-                res.send(`{ "status": 400, "message: "Found more than 1 endpoint with id ${endpoint_id} and mockid ${mock_id}"}`)
+                res.send(`{ "status": 400, "message": "Found more than 1 endpoint with id ${endpoint_id} and mockid ${mock_id}"}`)
             }
     
             const {_id, ...body} = req.body
@@ -186,13 +187,13 @@ module.exports = class EndpointController {
                 console.error(`Error updating endpoint 1 ${endpoint_id}`, err)
                 res.status(500)
                 res.type("application/json")
-                res.send(err)
+                res.send(`{"status": 500, "message": "Error updating endpoint_1"}`)
             })
         }).catch(err => {
             console.error(`Error updating endpoint 2 ${endpoint_id}`, err)
             res.status(500)
             res.type("application/json")
-            res.send(err)
+            res.send(`{"status": 500, "message": "Error updating endpoint_2 "}`)
         })
     }
 
@@ -203,7 +204,7 @@ module.exports = class EndpointController {
             "mock_id": mock_id
         }
         
-        MongoClient.delete(Constants.ENDPOINT_COLLECTION_NAME, query)
+        MongoClient.deleteOne(Constants.ENDPOINT_COLLECTION_NAME, query)
         .then(result => {
             if(result.result.n == 1){
                 res.status(200)
@@ -231,6 +232,7 @@ function getPrefix(mockId){
         const queryMock = {
             "_id": mongo.ObjectId(mockId)
         }
+        console.log(queryMock)
         MongoClient.find(Constants.MOCK_COLLECTION_NAME, queryMock)
         .then(mocks => {
             resolve(mocks[0] && mocks[0].prefix)
