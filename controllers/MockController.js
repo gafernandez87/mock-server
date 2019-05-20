@@ -223,13 +223,13 @@ module.exports = class MockController {
                 product: mock.product,
                 author: mock.author,
                 description: mock.description,
-                prefix: `/copy${mock.prefix}`
+                prefix: `/copy_${mock.prefix}`
             })
             .then(newMock => {
                 //Inserto los clones de los endpoints
                 const newEndpointIdList = endpointList.map(endpoint =>{
                     const newHttpRequest = {...endpoint.httpRequest}
-                    newHttpRequest.prefix = `/copy${newHttpRequest.prefix}`
+                    newHttpRequest.prefix = `/copy_${newHttpRequest.prefix}`
                     return MongoClient.insert(Constants.ENDPOINT_COLLECTION_NAME, {
                         mock_id: newMock.insertedId.toString(), 
                         name: `(Copy) ${endpoint.name}`,
