@@ -21,7 +21,6 @@ module.exports = class EndpointController {
             "httpRequest.path": path,
             "httpRequest.method": req.method.toUpperCase()
         }
-        console.log(query)
         MongoClient.find(Constants.ENDPOINT_COLLECTION_NAME, query)
         .then(data => {
             if(data.length == 0){
@@ -30,7 +29,9 @@ module.exports = class EndpointController {
                 res.send(`{"error": "El path ${req.method.toUpperCase()} ${req.path} no existe"}`)
             }else if(data.length == 1){
                 const endpoint = data[0]
+                console.log("response", endpoint.httpResponse)
                 const {headers} = endpoint.httpResponse
+                const timeout = endpoint.httpResponse.timeout || 1
 
                 //Seteo los headers
                 let isXml = false
@@ -50,12 +51,13 @@ module.exports = class EndpointController {
                 if(body){
                     if(isXml){
                         const bodyXml = js2xmlparser.parse("body", sanitizeJson(body))
-                        res.send(bodyXml)
+                        setTimeout(()=> {res.send(bodyXml)}, timeout)
                     }else{
-                        res.send(body)
+                        setTimeout(()=> {res.send(body)}, timeout)
+                        //res.send(body)
                     }
                 }else{
-                    res.send("{}")
+                    setTimeout(()=> {res.send("{}")}, timeout)
                 }
             }else{
                 res.status(500)
