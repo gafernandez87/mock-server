@@ -51,7 +51,7 @@ module.exports = class MockController {
         })
     }
 
-    getMocks(_, res) {
+    getMock(req, res) {
         const { mock_id } = req.params
         const query = {_id: mongo.ObjectId(mock_id)}
 
@@ -61,10 +61,11 @@ module.exports = class MockController {
                 res.status(404)
                 res.type("application/json")
                 res.send(`{"status": 404, "message": "Mock ${mock_id} not found"}`)
+            }else{
+                res.status(200)
+                res.type("application/json")
+                res.send(mocks)
             }
-            res.status(200)
-            res.type("application/json")
-            res.send(mocks)
         })
         .catch(err => {
             res.status(500)
@@ -223,13 +224,13 @@ module.exports = class MockController {
                 product: mock.product,
                 author: mock.author,
                 description: mock.description,
-                prefix: `/copy_${mock.prefix}`
+                prefix: `${mock.prefix}_copy`
             })
             .then(newMock => {
                 //Inserto los clones de los endpoints
                 const newEndpointIdList = endpointList.map(endpoint =>{
                     const newHttpRequest = {...endpoint.httpRequest}
-                    newHttpRequest.prefix = `/copy_${newHttpRequest.prefix}`
+                    newHttpRequest.prefix = `${newHttpRequest.prefix}_copy`
                     return MongoClient.insert(Constants.ENDPOINT_COLLECTION_NAME, {
                         mock_id: newMock.insertedId.toString(), 
                         name: `(Copy) ${endpoint.name}`,

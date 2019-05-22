@@ -11,6 +11,7 @@ routes.get("/health", (_, res) => {
 
 routes.get("/setup", MockController.setup)
 
+routes.get("/mocks/:mock_id", MockController.getMock)
 routes.get("/mocks", MockController.getAllMocks)
 routes.post("/mocks", MockController.newMock)
 routes.put("/mocks/:mock_id", MockController.updateMock)
