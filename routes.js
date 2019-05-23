@@ -20,10 +20,10 @@ routes.get("/mocks/:mock_id/clone", MockController.cloneMock)
 
 routes.get("/endpoints", EndpointController.getAllEndpoints)
 routes.get("/mocks/:mock_id/endpoints", EndpointController.getAllEndpointsByMock)
+routes.get("/mocks/:mock_id/endpoints/:endpoint_id/clone", EndpointController.cloneEndpoint)
 routes.post("/mocks/:mock_id/endpoints/", EndpointController.newEndpoint)
 routes.put("/mocks/:mock_id/endpoints/:endpoint_id", EndpointController.updateEndpoint)
 routes.delete("/mocks/:mock_id/endpoints/:endpoint_id", EndpointController.deleteEndpoint)
-
 
 routes.get("/*", EndpointController.genericEndpoint)
 routes.put("/*", EndpointController.genericEndpoint)

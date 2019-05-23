@@ -3,9 +3,11 @@ const Constants = require('../utils/Constants')
 const MongoClient = new (require('../clients/MongoClient'))()
 const js2xmlparser = require("js2xmlparser");
 
+const collectionName = Constants.ENDPOINT_COLLECTION_NAME
+
 module.exports = class EndpointController {
     
-    genericEndpoint(req, res){
+    genericEndpoint(req, res) {
         //Separo el prefix del path
         let prefix, path = ""
         req.path.split("/").forEach((e, i) => {
@@ -21,7 +23,7 @@ module.exports = class EndpointController {
             "httpRequest.path": path,
             "httpRequest.method": req.method.toUpperCase()
         }
-        MongoClient.find(Constants.ENDPOINT_COLLECTION_NAME, query)
+        MongoClient.find(collectionName, query)
         .then(data => {
             if(data.length == 0){
                 console.log("Not found")
@@ -71,8 +73,8 @@ module.exports = class EndpointController {
         })
     }
 
-    getAllEndpoints(_, res){
-        MongoClient.findAll(Constants.ENDPOINT_COLLECTION_NAME)
+    getAllEndpoints(_, res) {
+        MongoClient.findAll(collectionName)
         .then(endpoints => {
             res.status(200)
             res.type("application/json")
@@ -84,14 +86,14 @@ module.exports = class EndpointController {
         })
     }
 
-    getAllEndpointsByMock(req, res){
+    getAllEndpointsByMock(req, res) {
         const query = {
             mock_id: req.params.mock_id
         }
 
         console.log(`getting endpoints from mock ${req.params.mock_id}`)
 
-        MongoClient.find(Constants.ENDPOINT_COLLECTION_NAME, query)
+        MongoClient.find(collectionName, query)
         .then(endpoints => {
             console.log(query)
             res.status(200)
@@ -118,15 +120,14 @@ module.exports = class EndpointController {
                 "httpRequest.method": httpRequest.method
             }
     
-            console.log(query)
-            MongoClient.find(Constants.ENDPOINT_COLLECTION_NAME, query)
+            MongoClient.find(collectionName, query)
             .then(items => {
                 if(items.length > 0){
                     res.status("400")
                     res.type('application/json')
                     res.send(`{"error": "El path ${httpRequest.path} ya existe"}`)
                 }else{
-                    MongoClient.insert(Constants.ENDPOINT_COLLECTION_NAME,
+                    MongoClient.insert(collectionName,
                     {
                         mock_id: req.params.mock_id,
                         name,
@@ -150,14 +151,14 @@ module.exports = class EndpointController {
         })
     }
     
-    updateEndpoint(req, res){
-        const { endpoint_id, mock_id } = req.params
-           
+    updateEndpoint(req, res) {
+        const { endpoint_id, mock_id } = req.params   
         const query = {
             "_id": mongo.ObjectId(endpoint_id),
             "mock_id": mock_id
         }
-        MongoClient.find(Constants.ENDPOINT_COLLECTION_NAME, query)
+
+        MongoClient.find(collectionName, query)
         .then(endpoints => {
             if(endpoints.length == 0){
                 console.log(`Update endpoint error. Endpoint (id: ${endpoint_id}) not found in mocks(id: ${mock_id})"}`)
@@ -173,7 +174,7 @@ module.exports = class EndpointController {
             }
     
             const {_id, ...body} = req.body
-            MongoClient.update(Constants.ENDPOINT_COLLECTION_NAME, query, body)
+            MongoClient.update(collectionName, query, body)
             .then(result => {
                 if(result.result.n == 1){
                     res.status(200)
@@ -199,14 +200,14 @@ module.exports = class EndpointController {
         })
     }
 
-    deleteEndpoint(req, res){
+    deleteEndpoint(req, res) {
         const { endpoint_id, mock_id } = req.params
         const query = {
             "_id": mongo.ObjectId(endpoint_id),
             "mock_id": mock_id
         }
         
-        MongoClient.deleteOne(Constants.ENDPOINT_COLLECTION_NAME, query)
+        MongoClient.deleteOne(collectionName, query)
         .then(result => {
             if(result.result.n == 1){
                 res.status(200)
@@ -227,6 +228,43 @@ module.exports = class EndpointController {
         })
     }
    
+    cloneEndpoint(req, res) {
+        const { endpoint_id, mock_id } = req.params
+        const query = {
+            "_id": mongo.ObjectId(endpoint_id),
+            "mock_id": mock_id
+        }
+        MongoClient.find(collectionName, query)
+        .then(endpoints => {
+            if(endpoints.length == 0){
+                console.log("Not found")
+                res.status(404)
+                res.send(`{"error": "El path ${req.method.toUpperCase()} ${req.path} no existe"}`)
+            }else if(endpoints.length == 1){
+                const endpoint = endpoints[0]
+                MongoClient.insert(collectionName,
+                {
+                    mock_id: endpoint.mock_id,
+                    name: `(Copy) ${endpoint.name}`,
+                    author: endpoint.author,
+                    httpRequest: {...endpoint.httpRequest},
+                    httpResponse: {...endpoint.httpResponse}
+                })
+                .then(data => {
+                    res.status(201)
+                    res.type('application/json')
+                    res.send(`{"_id": "${data.insertedId}"}`)
+                })
+
+            }else if(endpoints.length > 1){
+                console.log(`Update endpoint error. Found more than 1 endpoint with id ${endpoint_id} and mockid ${mock_id}`)
+                res.status(400)
+                res.type("application/json")
+                res.send(`{ "status": 400, "message": "Found more than 1 endpoint with id ${endpoint_id} and mockid ${mock_id}"}`)
+            }
+
+        })
+    }
 }
 
 function getPrefix(mockId){
@@ -234,7 +272,6 @@ function getPrefix(mockId){
         const queryMock = {
             "_id": mongo.ObjectId(mockId)
         }
-        console.log(queryMock)
         MongoClient.find(Constants.MOCK_COLLECTION_NAME, queryMock)
         .then(mocks => {
             resolve(mocks[0] && mocks[0].prefix)
