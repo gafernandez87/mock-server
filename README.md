@@ -79,6 +79,11 @@ PUT /mock-server/mocks/:mock_id
     }
 ````
 
+### Clone Mock
+````
+GET /mock-server/mocks/:mock_id
+````
+
 ### Create Endpoint
 
 ````
@@ -193,6 +198,11 @@ PUT /mock-server/mocks/:mock_id/endpoints/:endpoint_id
     {
         "name": "Identity Service mock"
     }
+````
+
+### Clone Endpoint
+````
+GET /mock-server/mocks/:mock_id/endpoints/:endpoint_id/clone
 ````
 
 ### Delete an endpoint

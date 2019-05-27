@@ -2,6 +2,7 @@ const mongo = require('mongodb')
 const Constants = require('../utils/Constants')
 const MongoClient = new (require('../clients/MongoClient'))()
 const js2xmlparser = require("js2xmlparser");
+const parseString = require('xml2js').parseString
 
 const collectionName = Constants.ENDPOINT_COLLECTION_NAME
 
@@ -31,33 +32,46 @@ module.exports = class EndpointController {
                 res.send(`{"error": "El path ${req.method.toUpperCase()} ${req.path} no existe"}`)
             }else if(data.length == 1){
                 const endpoint = data[0]
-                console.log("response", endpoint.httpResponse)
                 const {headers} = endpoint.httpResponse
                 const timeout = endpoint.httpResponse.timeout || 1
 
                 //Seteo los headers
-                let isXml = false
                 if(headers) {
-                    let keys = Object.keys(headers)
-                    keys.forEach(key => {
-                        if(headers[key].indexOf("xml") != -1){
-                            isXml = true
-                        }
+                    Object.keys(headers).forEach(key => {
                         res.set(key, headers[key])
                     })
                 }
 
                 //Seteo status code
                 res.status(endpoint.httpResponse.status_code)
-                const body = endpoint.httpResponse.body
+
+                let body = endpoint.httpResponse.body
+                const bodyType = endpoint.httpResponse.bodyType
                 if(body){
-                    if(isXml){
-                        const bodyXml = js2xmlparser.parse("body", sanitizeJson(body))
-                        setTimeout(()=> {res.send(bodyXml)}, timeout)
-                    }else{
-                        setTimeout(()=> {res.send(body)}, timeout)
-                        //res.send(body)
+                    switch (bodyType){
+                        case "json":{
+                            res.type("application/json")
+                            console.log(body)
+                            body = JSON.parse(body)
+                            break;
+                        }
+                        case "xml":{
+                            parseString(body, (err, result) => {
+                                if(err){
+                                    return "error parsing XML"
+                                }else{
+                                    res.set("content-type", "application/xml")
+                                    return result
+                                }
+                            })
+                            break;
+                        }
+                        default: { // text
+                            res.type("text/plain")
+                            break;
+                        }
                     }
+                    setTimeout(()=> {res.send(body)}, timeout)
                 }else{
                     setTimeout(()=> {res.send("{}")}, timeout)
                 }
@@ -69,7 +83,7 @@ module.exports = class EndpointController {
         .catch(err => {
             res.status(500)
             res.type("application/json")
-            res.send(err)
+            res.send(`{"error": "${err.message}"}`)
         })
     }
 
@@ -91,8 +105,6 @@ module.exports = class EndpointController {
             mock_id: req.params.mock_id
         }
 
-        console.log(`getting endpoints from mock ${req.params.mock_id}`)
-
         MongoClient.find(collectionName, query)
         .then(endpoints => {
             console.log(query)
@@ -102,7 +114,7 @@ module.exports = class EndpointController {
         })
         .catch(err => {
             res.status(500)
-            res.send(`Error ${err}`)
+            res.send(`{"error": "${err.message}"}`)
         })
     }
     
@@ -147,7 +159,7 @@ module.exports = class EndpointController {
         .catch(err => {
             res.status(500)
             res.type('application/json')
-            res.send(err)
+            res.send(`{"error": "${err.message}"}`)
         })
     }
     
@@ -224,7 +236,7 @@ module.exports = class EndpointController {
             console.error(`Error deleting endpoint ${endpoint_id}`, err)
             res.status(500)
             res.type("application/json")
-            res.send(err)
+            res.send(`{"error": "${err.message}"}`)
         })
     }
    
@@ -279,14 +291,4 @@ function getPrefix(mockId){
             reject(err)
         })
     }) 
-}
-
-function sanitizeJson(body){
-
-    const newBody = Object.keys(body).reduce((acc, current) => {
-        acc[current.trim().replace(new RegExp(" ", 'g'), "_")] = body[current]
-        return acc
-    }, {})
-
-    return newBody
 }
