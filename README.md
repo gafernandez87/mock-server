@@ -218,13 +218,3 @@ DELETE /mock-server/mocks/:mock_id/endpoints/endpoint
 3. Start a local mongo in port 27017
 4. npm start
 
-
-## How to use it en DEV
-
-The mock server API is hosted in https://integrations.dev.fintechpeople.io:4443/mock-server. 
-You need to be connected to dev VPN in order to access.
-
-We also have a front end where you can check, add, modify and remove data
-https://mock-server-front.dev.fintechpeople.io/
-
-Please, use it wisely
