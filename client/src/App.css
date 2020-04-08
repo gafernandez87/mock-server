@@ -1,0 +1,131 @@
+body {
+  background-color: #f0f2f5 !important;
+}
+
+.ant-layout-content {
+  border: 1px solid #b9b9b9;
+}
+
+.ant-layout-header {
+  padding: 0 20px !important;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 40vmin;
+  pointer-events: none;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.endpointCard{
+  width: 400;
+  margin-bottom: 10px;
+}
+
+.endpointCard:hover{
+  background-color: #aecbe8;
+  cursor: pointer;
+}
+
+.endpointCard.selected{
+  background-color: #aecbe8;
+}
+
+.error textarea{
+  border: 1px solid red !important;
+}
+
+.error p{
+  color: red;
+}
+
+.ant-card {
+  margin: 8px !important;
+}
+
+.ant-menu {
+      display: flex;
+}
+
+.ant-menu-item {
+  font-weight: 600;
+  background: #ececec
+}
+
+.ant-alert-banner {
+  margin-bottom: 15px;
+}
+
+.ant-modal-header {
+  background: #f7f7f7 !important;
+}
+
+.ant-card-bordered {
+    border: 1px solid #ababab !important;
+    background: #fbfbfb !important;
+}
+
+.ant-card-head {
+  background: #f7f7f7 !important;
+}
+
+.ant-card.selected {
+  background: #e8e8e8 !important;
+}
+
+.ant-form-item {
+  margin-bottom: 6px !important;
+}
+
+.ant-tag-green {
+  font-weight: bold;
+}
+
+.ant-page-header-content-view{
+  display: inline-block;
+}
+
+.ant-page-header {
+  display: flex;
+  align-items: baseline;
+  padding: 0px 5px !important;
+}
+
+.ant-page-header-content-view {
+  margin-left: auto;
+}
+
+.ant-steps {
+  padding-left: 7px !important;
+}
+
+.blured {
+  filter: grayscale(0.5) blur(3px);
+}
